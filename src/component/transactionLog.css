@@ -1,0 +1,29 @@
+.transaction-log-container {
+    margin-top: 20px;
+  }
+  
+  .transaction-log-button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .transaction-log-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .transaction-log-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .transaction-log-item {
+    margin-bottom: 10px;
+    padding: 8px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+  }
+  
