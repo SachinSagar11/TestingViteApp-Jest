@@ -1,8 +1,11 @@
+/**
+ * @jest-environment jsdom
+ */
+import { fireEvent, render } from "@testing-library/react";
 import React from "react";
-import { render, fireEvent } from "@testing-library/react";
 import { useDispatch, useSelector } from "react-redux";
 import App from "./App";
-import { deposit, withdrawal, transfer } from "./redux/accountSlice";
+import { deposit, transfer, withdrawal } from "./redux/accountSlice";
 
 jest.mock("react-redux", () => ({
   useDispatch: jest.fn(),
