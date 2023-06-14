@@ -2,95 +2,60 @@
  * @jest-environment jsdom
  */
 
-
-
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
-import { useDispatch, useSelector } from "react-redux";
 import App from "./App";
 import { deposit, withdrawal, transfer } from "./redux/accountSlice";
 
-jest.mock("react-redux", () => ({
-  useDispatch: jest.fn(),
-  useSelector: jest.fn(),
+jest.mock("./redux/accountSlice", () => ({
+  deposit: jest.fn(),
+  withdrawal: jest.fn(),
+  transfer: jest.fn(),
 }));
 
 describe("App", () => {
-  let useDispatchMock;
-  let useSelectorMock;
-
-  beforeEach(() => {
-    useDispatchMock = useDispatch;
-    useSelectorMock = useSelector;
-  });
-
-  afterEach(() => {
-    useDispatchMock.mockClear();
-    useSelectorMock.mockClear();
-  });
-
-  test("renders App component", () => {
-    useDispatchMock.mockReturnValue(jest.fn());
-    useSelectorMock.mockReturnValue({ account: { balance: 0 } });
-
-    const { getByText, getByPlaceholderText } = render(<App />);
-
-    expect(getByText("Bank Account")).toBeInTheDocument();
-    expect(getByPlaceholderText("Recipient Name")).toBeInTheDocument();
-    expect(getByPlaceholderText("Amount")).toBeInTheDocument();
+  test("renders balance correctly", () => {
+    const { getByText } = render(<App />);
+    const balanceElement = getByText("Current Balance: 0");
+    expect(balanceElement).toBeInTheDocument();
   });
 
   test("handles deposit", () => {
-    const dispatchMock = jest.fn();
-    useDispatchMock.mockReturnValue(dispatchMock);
-    useSelectorMock.mockReturnValue({ account: { balance: 0 } });
-
     const { getByText, getByPlaceholderText } = render(<App />);
+    const depositInput = getByPlaceholderText("Deposit Amount");
+    const depositButton = getByText("Deposit");
 
-    fireEvent.change(getByPlaceholderText("Amount"), {
-      target: { value: "100" },
-    });
-    fireEvent.click(getByText("Deposit"));
+    fireEvent.change(depositInput, { target: { value: "100" } });
+    fireEvent.click(depositButton);
 
-    expect(dispatchMock).toHaveBeenCalledWith(deposit({ amount: 100 }));
-    expect(getByPlaceholderText("Amount")).toHaveValue(0);
+    expect(deposit).toHaveBeenCalledWith({ amount: 100 });
+    expect(depositInput.value).toBe("0");
   });
 
   test("handles withdrawal", () => {
-    const dispatchMock = jest.fn();
-    useDispatchMock.mockReturnValue(dispatchMock);
-    useSelectorMock.mockReturnValue({ account: { balance: 100 } });
-
     const { getByText, getByPlaceholderText } = render(<App />);
+    const withdrawalInput = getByPlaceholderText("Withdrawal Amount");
+    const withdrawalButton = getByText("Withdraw");
 
-    fireEvent.change(getByPlaceholderText("Amount"), {
-      target: { value: "50" },
-    });
-    fireEvent.click(getByText("Withdraw"));
+    fireEvent.change(withdrawalInput, { target: { value: "50" } });
+    fireEvent.click(withdrawalButton);
 
-    expect(dispatchMock).toHaveBeenCalledWith(withdrawal({ amount: 50 }));
-    expect(getByPlaceholderText("Amount")).toHaveValue(0);
+    expect(withdrawal).toHaveBeenCalledWith({ amount: 50 });
+    expect(withdrawalInput.value).toBe("0");
   });
 
   test("handles transfer", () => {
-    const dispatchMock = jest.fn();
-    useDispatchMock.mockReturnValue(dispatchMock);
-    useSelectorMock.mockReturnValue({ account: { balance: 100 } });
-
     const { getByText, getByPlaceholderText } = render(<App />);
+    const transferNameInput = getByPlaceholderText("Recipient Name");
+    const transferAmountInput = getByPlaceholderText("Amount");
+    const transferButton = getByText("Transfer");
 
-    fireEvent.change(getByPlaceholderText("Recipient Name"), {
-      target: { value: "John Doe" },
-    });
-    fireEvent.change(getByPlaceholderText("Amount"), {
-      target: { value: "50" },
-    });
-    fireEvent.click(getByText("Transfer"));
+    fireEvent.change(transferNameInput, { target: { value: "John" } });
+    fireEvent.change(transferAmountInput, { target: { value: "200" } });
+    fireEvent.click(transferButton);
 
-    expect(dispatchMock).toHaveBeenCalledWith(
-      transfer({ name: "John Doe", amount: 50 })
-    );
-    expect(getByPlaceholderText("Recipient Name")).toHaveValue("");
-    expect(getByPlaceholderText("Amount")).toHaveValue(0);
+    expect(transfer).toHaveBeenCalledWith({ name: "John", amount: 200 });
+    expect(transferNameInput.value).toBe("");
+    expect(transferAmountInput.value).toBe("0");
   });
 });
